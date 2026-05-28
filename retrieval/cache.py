@@ -3,9 +3,7 @@ import os
 
 CACHE_FILE = "cache/query_cache.json"
 
-
 def load_cache():
-
     if not os.path.exists(CACHE_FILE):
         return {}
 
@@ -14,7 +12,6 @@ def load_cache():
 
 
 def save_cache(cache):
-
     with open(CACHE_FILE, "w", encoding="utf-8") as f:
         json.dump(
             cache,
@@ -25,16 +22,11 @@ def save_cache(cache):
 
 
 def get_cached_answer(query):
-
     cache = load_cache()
-
     return cache.get(query.lower())
 
 
 def store_answer(query, answer):
-
     cache = load_cache()
-
     cache[query.lower()] = answer
-
     save_cache(cache)

@@ -32,4 +32,4 @@ def generate_answer(query, context):
         ]
     )
 
-    return response
+    return response['message']['content']

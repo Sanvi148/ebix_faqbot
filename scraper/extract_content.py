@@ -12,21 +12,13 @@ def extract_content(url):
     # ==================================================
 
     faq_cards = soup.find_all("div", class_="card")
-
     if faq_cards:
-
         for card in faq_cards:
-
             question_tag = card.find(["h5", "h6"])
-
             answer_tag = card.find("div", class_="collapse")
-
             if question_tag and answer_tag:
-
                 question = question_tag.get_text(" ", strip=True)
-
                 answer = answer_tag.get_text(" ", strip=True)
-
                 faq_chunk = f"Q: {question}\nA: {answer}"
                 chunks.append(faq_chunk)
 
@@ -99,28 +91,18 @@ def extract_content(url):
 # ==================================================
 
     tab_panes = soup.select("div.tab-pane")
-
     for pane in tab_panes:
-
         region = pane.get("id", "").replace("-", " ").title()
-
         office_cards = pane.select("div.col-md-4.col-lg-3.mb-4")
-
         for office in office_cards:
-
             city_tag = office.find("h6")
-
             address_tag = office.select_one("div.office_address p")
-
             email_tag = office.find("a", href=lambda x: x and "mailto:" in x)
-
             city = city_tag.get_text(" ", strip=True) if city_tag else ""
-
             address = (
                 address_tag.get_text(" ", strip=True)
                 if address_tag else ""
             )
-
             email = (
                 email_tag.get_text(" ", strip=True)
                 if email_tag else ""
@@ -144,13 +126,9 @@ def extract_content(url):
     # ==================================================
 
     if not chunks:
-
         downloaded = trafilatura.fetch_url(url)
-
         text = trafilatura.extract(downloaded)
-
         if text:
-
             chunks.append(text)
 
     print("\nTOTAL CHUNKS:", len(chunks))

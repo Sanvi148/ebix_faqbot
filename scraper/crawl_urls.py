@@ -24,15 +24,10 @@ def get_all_urls(base_url):
 
         try:
             response = requests.get(url, timeout=10)
-
             soup = BeautifulSoup(response.text, "html.parser")
-
             for link in soup.find_all("a", href=True):
-
                 full_url = urljoin(base_url, link["href"])
-
                 if full_url.startswith(base_url):
-
                     if full_url not in visited:
                         to_visit.append(full_url)
 

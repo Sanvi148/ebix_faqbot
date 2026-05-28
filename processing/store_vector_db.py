@@ -1,13 +1,26 @@
 import chromadb
 client=chromadb.PersistentClient(path="./vectordb")
-collection=client.get_or_create_collection(
+import uuid
+# try:
+#     client.delete_collection("faq_bot")
+# except:
+#     pass
+
+collection = client.get_or_create_collection(
     name="faq_bot"
 )
-def store_chunks(chunks,embeddings):
-    ids=[str(i) for i in range(len(chunks))]
+
+
+def store_chunks(chunks, embeddings,metadatas):
+
+    ids = [str(uuid.uuid4()) for _ in range(len(chunks))]
+
     collection.add(
-        ids=ids,
-        documents=chunks,
-        embeddings=embeddings
-    )
+    ids=ids,
+    documents=chunks,
+    embeddings=embeddings,
+    metadatas=metadatas
+)
+
+    print("\nChunks stored successfully.")
     

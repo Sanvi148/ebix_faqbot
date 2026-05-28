@@ -16,9 +16,10 @@ def chatbot():
         try:
             #retrieve rellevant chunks
             retrieved_chunks=retrieve_chunks(query)
-            #convert chunks to context and generate answer
-            context="\n".join(retrieved_chunks)
+            context="\n\n".join(retrieved_chunks)
             answer=generate_answer(query, context)
+            print("RETREIVED CHUNKS:      " ,retrieved_chunks) 
+            
             print(f"\nAnswer:\n{answer}\n")
             print("\n" + "-" * 60 + "\n")
         except Exception as e:

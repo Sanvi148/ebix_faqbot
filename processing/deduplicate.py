@@ -1,8 +1,9 @@
 from sklearn.metrics.pairwise import cosine_similarity
 THRESHOLD=0.90
-def remove_duplicates(chunks,embeddings):
+def remove_duplicates(chunks,embeddings,metadatas):
     unique_chunks=[]
     unique_embeddings=[]
+    unique_metadatas = []
     for i,emb in enumerate(embeddings):
         duplicate=False
         for existing_emb in unique_embeddings:
@@ -13,4 +14,5 @@ def remove_duplicates(chunks,embeddings):
         if not duplicate:
             unique_chunks.append(chunks[i])
             unique_embeddings.append(emb)
-    return unique_chunks, unique_embeddings
+            unique_metadatas.append(metadatas[i])
+    return unique_chunks, unique_embeddings, unique_metadatas

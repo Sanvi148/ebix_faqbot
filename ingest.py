@@ -6,16 +6,19 @@ from processing.chunking import chunk_text
 from processing.embeddings import generate_embeddings
 from processing.deduplicate import remove_duplicates
 from processing.store_vector_db import store_chunks
+from processing.store_vector_db import collection
 
 BASE_URL = "https://ebixcash.com/"
 def ingestion_pipeline():
     """Runs complete website ingestion pipeline"""
     os.makedirs("data", exist_ok=True)
 
-    raw_file = open("data/raw_chunks.txt", "w", encoding="utf-8")
-    clean_file = open("data/cleaned_chunks.txt", "w", encoding="utf-8")
+    raw_file = open("data/raw_chunks.txt", "a", encoding="utf-8")
+    clean_file = open("data/cleaned_chunks.txt", "a", encoding="utf-8")
     print("\n Starting Website Crawling...\n")
-    urls =get_all_urls(BASE_URL)
+    urls = [
+    "https://www.ebixcash.com/discover-ebixcash/leadership/"
+    ]
     print(f" Total URLs Found: {len(urls)}\n")
     all_chunks=[]
     all_metadata = []
@@ -25,6 +28,9 @@ def ingestion_pipeline():
             chunks=extract_content(url)
             if not chunks:
                 continue
+            collection.delete(
+                where={"source": url}
+            )
             for chunk in chunks:
                 raw_file.write(f"\n\n{'='*80}\n")
                 raw_file.write(f"URL: {url}\n\n")

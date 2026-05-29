@@ -23,7 +23,7 @@ def generate_answer(query, context):
     """
 
     response = ollama.chat(
-        model='llama3',
+        model='phi3',
         messages=[
             {
                 'role': 'user',

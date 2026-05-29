@@ -1,11 +1,38 @@
 import requests
 import trafilatura
 from bs4 import BeautifulSoup
-
+from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.chrome.options import Options
+from bs4 import BeautifulSoup
+import time
 
 def extract_content(url):
-    response = requests.get(url)
-    soup = BeautifulSoup(response.text, "html.parser")
+
+    options = Options()
+
+    options.add_argument("--headless")
+    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--no-sandbox")
+    options.add_argument("--disable-dev-shm-usage")
+
+    driver = webdriver.Chrome(
+        service=Service(ChromeDriverManager().install()),
+        options=options
+    )
+
+    driver.get(url)
+
+    time.sleep(5)
+
+    html = driver.page_source
+
+    soup = BeautifulSoup(html, "html.parser")
+
+    print("BOD FOUND:", len(soup.select("div.bod")))
+
+    driver.quit()
     chunks = []
     # ==================================================
     # 1. FAQ / Accordion Extraction
@@ -23,38 +50,54 @@ def extract_content(url):
                 chunks.append(faq_chunk)
 
                 
-    director_cards = soup.select(
-    "div.col-xl-3.col-md-6.text-center.bod.position-static"
-)
+    director_cards = soup.select("div.bod")
 
     for card in director_cards:
 
-        name_tag = card.select_one("div.name")
-
-        designation_tag = card.select_one("div.designation")
-
-        profile_tag = card.find("a")
-
+        name_tag = card.find("div", class_="name")
         name = name_tag.get_text(strip=True) if name_tag else ""
 
+        designation_tag = card.find(
+            "div", class_="designation"
+        )
         designation = (
             designation_tag.get_text(strip=True)
             if designation_tag else ""
         )
 
-        profile_link = (
-            profile_tag.get("href")
-            if profile_tag else ""
-        )
+        profile_link = card.find("a")
+
+        target = ""
+
+        if profile_link:
+            target = profile_link.get("href", "")
+
+        # remove #
+        target = target.replace("#", "")
+
+        profile_div = soup.find("div", id=target)
+
+        description = ""
+
+        if profile_div:
+            paragraphs = profile_div.find_all("p")
+
+            description = " ".join(
+                p.get_text(" ", strip=True)
+                for p in paragraphs
+            )
 
         chunk = f"""
-        Board Director
         Name: {name}
+
         Designation: {designation}
-        Profile: {profile_link}
+
+        Description:
+        {description}
         """
 
-        chunks.append(chunk)        
+        print(chunk)
+        chunks.append(chunk)   
 # # ==================================================
 # # TAB + CONTENT GROUPING
 # # ==================================================

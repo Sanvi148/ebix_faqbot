@@ -24,9 +24,12 @@ def generate_answer(query, context):
 
     Answer:
     """
-
+    print("=" * 80)
+    print("CONTEXT SENT TO LLM")
+    print(context)
+    print("=" * 80)
     response = ollama.chat(
-        model='llama3',
+        model='phi3',
         messages=[
             {
                 'role': 'user',

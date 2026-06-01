@@ -13,17 +13,25 @@ def ingestion_pipeline():
     """Runs complete website ingestion pipeline"""
     os.makedirs("data", exist_ok=True)
 
-    raw_file = open("data/raw_chunks.txt", "w", encoding="utf-8")
-    clean_file = open("data/cleaned_chunks.txt", "w", encoding="utf-8")
+    raw_file = open("data/raw_chunks.txt", "a", encoding="utf-8")
+    clean_file = open("data/cleaned_chunks.txt", "a", encoding="utf-8")
     print("\n Starting Website Crawling...\n")
-    urls = get_all_urls(BASE_URL)
+    urls = ["https://ebixcash.com/ebixcash-business/agent-assisted-model/"]
     print(f" Total URLs Found: {len(urls)}\n")
     all_chunks=[]
     all_metadata = []
     for url in urls:
         try:
+            print(f"Deleting old chunks for: {url}")
+
+            collection.delete(
+                where={"source": url}
+            )
             print(f" Processing: {url}")
             chunks=extract_content(url)
+            if not chunks:
+                print("No chunks extracted!")
+                continue
             print("\nTOTAL RAW CHUNKS:", len(chunks))
 
             for chunk in chunks:
@@ -32,9 +40,6 @@ def ingestion_pipeline():
                     print(chunk)
             if not chunks:
                 continue
-            collection.delete(
-                where={"source": url}
-            )
             for chunk in chunks:
                 raw_file.write(f"\n\n{'='*80}\n")
                 raw_file.write(f"URL: {url}\n\n")
@@ -59,7 +64,9 @@ def ingestion_pipeline():
         except Exception as e:
             print(f" Error processing {url}: {e}")
     print(f"\n Total Chunks Created: {len(all_chunks)}\n")
-
+    if not all_chunks:
+        print("No chunks generated. Exiting.")
+        return
     #generate embeddings
     print("\nGenerating Embeddings...\n")
     embeddings = generate_embeddings(all_chunks)

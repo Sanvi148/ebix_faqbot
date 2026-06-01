@@ -96,37 +96,37 @@ def extract_content(url):
 
         print(chunk)
         chunks.append(chunk)   
-# # ==================================================
-# # TAB + CONTENT GROUPING
-# # ==================================================
+# ==================================================
+# TAB + CONTENT GROUPING
+# ==================================================
 
-#     tabs = soup.find_all("a", class_="nav-link")
+    tabs = soup.find_all("a", class_="nav-link")
 
-#     for tab in tabs:
+    for tab in tabs:
 
-#         # Get tab heading
-#         heading = tab.get_text(" ", strip=True)
+        # Get tab heading
+        heading = tab.get_text(" ", strip=True)
 
-#         # Get linked div id from href
-#         target = tab.get("href")
+        # Get linked div id from href
+        target = tab.get("href")
 
-#         if not target or not target.startswith("#"):
-#             continue
+        if not target or not target.startswith("#"):
+            continue
 
-#         # Remove #
-#         target_id = target.replace("#", "")
+        # Remove #
+        target_id = target.replace("#", "")
 
-#         # Find matching tab content
-#         content_div = soup.find("div", id=target_id)
+        # Find matching tab content
+        content_div = soup.find("div", id=target_id)
 
-#         if content_div:
+        if content_div:
 
-#             content_text = content_div.get_text(" ", strip=True)
+            content_text = content_div.get_text(" ", strip=True)
 
-#             final_chunk = f"{heading}\n\n{content_text}"
+            final_chunk = f"{heading}\n\n{content_text}"
 
-#             if len(content_text) > 50:
-#                 chunks.append(final_chunk)
+            if len(content_text) > 50:
+                chunks.append(final_chunk)
 # ==================================================
 # TAB + OFFICE EXTRACTION
 # ==================================================
@@ -162,6 +162,25 @@ def extract_content(url):
                     """
                 chunks.append(chunk)
     # ==================================================
+# TAB MAPPING
+# ==================================================
+
+    tab_mapping = {}
+
+    tabs = soup.select("a.nav-link")
+
+    for tab in tabs:
+
+        heading = tab.get_text(" ", strip=True)
+
+        href = tab.get("href")
+
+        if href and href.startswith("#"):
+
+            tab_mapping[href.replace("#", "")] = heading
+
+    print("TAB MAPPING:", tab_mapping)            
+    # ==================================================
 # OFFER CARDS EXTRACTION
 # ==================================================
 
@@ -170,7 +189,16 @@ def extract_content(url):
     offer_cards = soup.select("div.offer-card")
 
     for card in offer_cards:
+        category=""
+        parent_tab = card.find_parent("div", class_="tab-pane")
 
+        if parent_tab:
+
+            tab_id = parent_tab.get("id", "")
+
+            category = tab_mapping.get(tab_id, "")
+
+        print("CATEGORY:", category)
         title = ""
         subtitle = ""
         validity = ""
@@ -205,6 +233,7 @@ def extract_content(url):
         seen_offers.add(offer_key)
 
         chunk = f"""
+    Category: {category}
     Offer Title: {title}
 
     Offer Description: {subtitle}
@@ -216,8 +245,37 @@ def extract_content(url):
     {coupon}
     """
 
-        chunks.append(chunk)            
+        chunks.append(chunk) 
+        
+                   
+    section_heading = ""
 
+    heading_tag = soup.find(
+        lambda tag:
+            tag.name in ["h1", "h2", "h3"]
+            and "Benefits of becoming" in tag.get_text()
+    )
+
+    if heading_tag:
+        section_heading = heading_tag.get_text(" ", strip=True)
+
+    benefit_cards = soup.select("div.ps-card")
+
+    for card in benefit_cards:
+
+        desc = card.select_one("div.ps-desc")
+
+        if desc:
+
+            text = desc.get_text(" ", strip=True)
+
+            chunk = f"""
+            Section: {section_heading}
+
+            Benefit:
+            {text}
+        """
+        chunks.append(chunk)
     # ==================================================
     # 3. Article Extraction (Fallback)
     # ==================================================

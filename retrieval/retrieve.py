@@ -29,13 +29,13 @@ def retrieve_chunks(query):
         print("\nChunk Text:\n")
         print(chunk)
         print("\n" + "=" * 70)
-    top_2_chunks = all_chunks[:2]
+    top_6_chunks = all_chunks[:6]
 
-    print("\n========== TOP 2 CHUNKS SELECTED ==========\n")
+    print("\n========== TOP 6 CHUNKS SELECTED ==========\n")
 
-    for i, chunk in enumerate(top_2_chunks):
+    for i, chunk in enumerate(top_6_chunks):
         print(f"\n---- Top Chunk {i+1} -----\n")
         print(chunk)
         print("\n" + "=" * 70)
 
-    return top_2_chunks
+    return top_6_chunks

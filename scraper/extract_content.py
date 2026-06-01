@@ -163,6 +163,62 @@ def extract_content(url):
                     {email}
                     """
                 chunks.append(chunk)
+    # ==================================================
+# OFFER CARDS EXTRACTION
+# ==================================================
+
+    seen_offers = set()
+
+    offer_cards = soup.select("div.offer-card")
+
+    for card in offer_cards:
+
+        title = ""
+        subtitle = ""
+        validity = ""
+        coupon = ""
+
+        title_tag = card.find("h6")
+        if title_tag:
+            title = title_tag.get_text(" ", strip=True)
+
+        subtitle_tag = card.find("small")
+        if subtitle_tag:
+            subtitle = subtitle_tag.get_text(" ", strip=True)
+
+        validity_div = card.select_one("div.offer_validity")
+        if validity_div:
+            validity = validity_div.get_text(" ", strip=True)
+
+        coupon_div = card.select_one("div.coupon")
+        if coupon_div:
+            coupon = coupon_div.get_text(" ", strip=True)
+
+        # Skip empty cards
+        if not (title or subtitle or coupon):
+            continue
+
+        # Unique key
+        offer_key = f"{title}|{coupon}"
+
+        if offer_key in seen_offers:
+            continue
+
+        seen_offers.add(offer_key)
+
+        chunk = f"""
+    Offer Title: {title}
+
+    Offer Description: {subtitle}
+
+    Offer Validity:
+    {validity}
+
+    Coupon Code:
+    {coupon}
+    """
+
+        chunks.append(chunk)            
 
     # ==================================================
     # 3. Article Extraction (Fallback)

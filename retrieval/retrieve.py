@@ -16,7 +16,7 @@ def retrieve_chunks(query):
     query_embedding = model.encode([query])
     results = collection.query(
         query_embeddings=query_embedding,
-        n_results=10
+        n_results=20
     )
     all_chunks = results["documents"][0]
     distances = results["distances"][0]
@@ -29,7 +29,7 @@ def retrieve_chunks(query):
         print("\nChunk Text:\n")
         print(chunk)
         print("\n" + "=" * 70)
-        top_2_chunks = all_chunks[:2]
+    top_2_chunks = all_chunks[:2]
 
     print("\n========== TOP 2 CHUNKS SELECTED ==========\n")
 

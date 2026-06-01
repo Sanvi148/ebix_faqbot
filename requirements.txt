@@ -5,5 +5,3 @@ langchain
 sentence-transformers
 scikit-learn
 chromadb
-groq
-streamlit

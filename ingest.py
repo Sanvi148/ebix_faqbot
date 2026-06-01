@@ -13,12 +13,10 @@ def ingestion_pipeline():
     """Runs complete website ingestion pipeline"""
     os.makedirs("data", exist_ok=True)
 
-    raw_file = open("data/raw_chunks.txt", "a", encoding="utf-8")
-    clean_file = open("data/cleaned_chunks.txt", "a", encoding="utf-8")
+    raw_file = open("data/raw_chunks.txt", "w", encoding="utf-8")
+    clean_file = open("data/cleaned_chunks.txt", "w", encoding="utf-8")
     print("\n Starting Website Crawling...\n")
-    urls = [
-    "https://www.ebixcash.com/discover-ebixcash/leadership/"
-    ]
+    urls = get_all_urls(BASE_URL)
     print(f" Total URLs Found: {len(urls)}\n")
     all_chunks=[]
     all_metadata = []
@@ -26,6 +24,12 @@ def ingestion_pipeline():
         try:
             print(f" Processing: {url}")
             chunks=extract_content(url)
+            print("\nTOTAL RAW CHUNKS:", len(chunks))
+
+            for chunk in chunks:
+                if "Offer Title" in chunk:
+                    print("\n===== OFFER CHUNK FOUND =====")
+                    print(chunk)
             if not chunks:
                 continue
             collection.delete(
@@ -65,7 +69,15 @@ def ingestion_pipeline():
     print(f"\n Unique Chunks after deduplication: {len(unique_chunks)}\n")
     #store in vector db
     print("\nStoring chunks in vector database...\n")
+    print(
+    "Collection count BEFORE storing:",
+    collection.count()
+)
     store_chunks(unique_chunks, unique_embeddings ,unique_metadatas)
+    print(
+    "Collection count AFTER storing:",
+    collection.count()
+)
     print("\n Ingestion Pipeline Completed Successfully!\n")    
     raw_file.close()
     clean_file.close()

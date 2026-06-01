@@ -3,15 +3,18 @@ import ollama
 def generate_answer(query, context):
 
     prompt = f"""
-    You are a helpful assistant.
+    You are an FAQ assistant.
 
-    Answer ONLY from the provided context.
+    Use ONLY the information present in the provided context.
 
-    If the answer exists in context, provide it directly.
-
-    Do NOT refuse.
-    Do NOT say you lack information.
-    Do NOT mention policies.
+    Rules:
+    1. Answer directly from the context.
+    2. Do not make up information.
+    3. Do not add assumptions.
+    4. If the context contains the answer, provide it clearly and completely.
+    5. If multiple relevant items are present, list all of them.
+    6. If the answer is not found in the context, reply:
+    "I could not find this information in the available data."
 
     Context:
     {context}
@@ -23,7 +26,7 @@ def generate_answer(query, context):
     """
 
     response = ollama.chat(
-        model='phi3',
+        model='llama3',
         messages=[
             {
                 'role': 'user',

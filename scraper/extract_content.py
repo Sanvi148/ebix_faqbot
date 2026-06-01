@@ -13,24 +13,22 @@ def extract_content(url):
     options = Options()
 
     options.add_argument("--headless")
-    options.add_argument("--disable-blink-features=AutomationControlled")
+    options.add_argument("--disable-blink-features=AutomationControlled")#makes selenium less detectable
     options.add_argument("--no-sandbox")
-    options.add_argument("--disable-dev-shm-usage")
+    options.add_argument("--disable-dev-shm-usage")#Prevents memory issues in Docker/Linux environments.
 
     driver = webdriver.Chrome(
         service=Service(ChromeDriverManager().install()),
         options=options
     )
 
-    driver.get(url)
+    driver.get(url)#equivalent to typing url in browser and hitting enter
 
     time.sleep(5)
 
     html = driver.page_source
 
     soup = BeautifulSoup(html, "html.parser")
-
-    print("BOD FOUND:", len(soup.select("div.bod")))
 
     driver.quit()
     chunks = []

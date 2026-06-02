@@ -179,7 +179,26 @@ def extract_content(url):
 
             tab_mapping[href.replace("#", "")] = heading
 
-    print("TAB MAPPING:", tab_mapping)            
+    print("TAB MAPPING:", tab_mapping)
+
+
+    section=soup.find("div",class_="why-ebixcash")
+
+    if section:
+        heading=section.find("h1")
+        if heading:
+            chunk=heading.get_text(" ",strip=True)+"\n\n" 
+            cards=section.find_all("div",class_="why-ebixcash-text")
+            for card in cards:
+                title=card.find("h2")
+                desc=card.find("p")
+                if title and desc:
+                    chunk += f"""
+                        {title.get_text(' ', strip=True)}
+                        {desc.get_text(' ', strip=True)}
+
+                        """          
+            chunks.append(chunk)        
     # ==================================================
 # OFFER CARDS EXTRACTION
 # ==================================================

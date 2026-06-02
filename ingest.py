@@ -16,7 +16,7 @@ def ingestion_pipeline():
     raw_file = open("data/raw_chunks.txt", "a", encoding="utf-8")
     clean_file = open("data/cleaned_chunks.txt", "a", encoding="utf-8")
     print("\n Starting Website Crawling...\n")
-    urls = ["https://ebixcash.com/ebixcash-business/agent-assisted-model/"]
+    urls = ["https://ebixcash.com/ebixcash-business/"]
     print(f" Total URLs Found: {len(urls)}\n")
     all_chunks=[]
     all_metadata = []

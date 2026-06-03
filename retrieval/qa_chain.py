@@ -1,7 +1,7 @@
 import ollama
 
 def generate_answer(query, context):
-
+    
     prompt = f"""
     You are an FAQ assistant.
 

@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>EbixCash AI Assistant</title>
+
+<style>
+
+body{
+    font-family: Arial, sans-serif;
+    background:#f4f7fb;
+    margin:0;
+}
+
+.container{
+    width:900px;
+    margin:40px auto;
+}
+
+.header{
+    background:white;
+    padding:25px;
+    border-radius:12px;
+    text-align:center;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+.header h1{
+    margin:0;
+}
+
+.chat-box{
+    background:white;
+    margin-top:20px;
+    padding:20px;
+    border-radius:12px;
+    box-shadow:0 2px 10px rgba(0,0,0,0.1);
+}
+
+input{
+    width:80%;
+    padding:14px;
+    border:1px solid #ccc;
+    border-radius:8px;
+    font-size:16px;
+}
+
+button{
+    padding:14px 20px;
+    border:none;
+    border-radius:8px;
+    background:#0066ff;
+    color:white;
+    cursor:pointer;
+    font-size:16px;
+}
+
+button:hover{
+    background:#0052cc;
+}
+
+.message{
+    margin-top:20px;
+}
+
+.question{
+    background:#e8f0ff;
+    padding:15px;
+    border-radius:10px;
+    margin-bottom:10px;
+}
+
+.answer{
+    background:#f7f7f7;
+    padding:15px;
+    border-radius:10px;
+}
+
+.loading{
+    color:#0066ff;
+    font-weight:bold;
+}
+.context-box{
+    margin-top:10px;
+    padding:12px;
+    background:#fafafa;
+    border:1px solid #ddd;
+    border-radius:8px;
+
+    white-space: pre-wrap;
+    word-wrap: break-word;
+    overflow-wrap: break-word;
+
+    max-height:250px;
+    overflow-y:auto;
+
+    font-size:14px;
+    line-height:1.6;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <div class="header">
+        <h1>🤖 EbixCash AI Assistant</h1>
+        <p>Powered by FastAPI + ChromaDB + Ollama</p>
+    </div>
+
+    <div class="chat-box">
+
+        <input
+            id="question"
+            type="text"
+            placeholder="Ask anything about EbixCash..."
+        >
+
+        <button onclick="askQuestion()">
+            Send
+        </button>
+
+        <div id="result"></div>
+
+    </div>
+
+</div>
+
+<script>
+
+async function askQuestion(){
+    const question =
+        document.getElementById("question").value;
+    if(!question.trim()){
+
+        alert("Please enter a question");
+
+        return;
+    }
+    document.getElementById("result").innerHTML =
+        `<p class="loading">⏳ Searching knowledge base...</p>`;
+
+    try{
+
+        const response = await fetch(
+            "http://127.0.0.1:8000/chat",
+            {
+                method:"POST",
+                headers:{
+                    "Content-Type":"application/json"
+                },
+                body:JSON.stringify({
+                    question:question
+                })
+            }
+        );
+        if(!response.ok){
+            throw new Error("API Error");
+        }
+        const data = await response.json();
+
+        document.getElementById("result").innerHTML = `
+            <div class="message">
+                <div class="question">
+                    <b>Question:</b><br>
+                    ${question}
+                </div>
+
+                <div class="answer">
+                    <b>Answer:</b><br>
+                    ${data.answer}
+                </div>
+                <details>
+                    <summary>Retrieved Context</summary>
+
+                    <div class="context-box">
+                        ${data.context}
+                    </div>
+
+                </details>
+            </div>
+        `;
+
+    }catch(err){
+
+        document.getElementById("result").innerHTML =
+        `<p style="color:red">
+            Failed to connect to API
+         </p>`;
+    }
+}
+document.getElementById("question")
+.addEventListener("keypress", function(event){
+
+    if(event.key === "Enter"){
+        askQuestion();
+    }
+
+});
+</script>
+
+</body>
+</html>
